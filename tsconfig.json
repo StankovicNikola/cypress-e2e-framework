@@ -5,7 +5,7 @@
     "types": ["cypress"],
     "strict": true,
     "esModuleInterop": true,
-    "moduleResolution": "node"
+    "moduleResolution": "bundler"
   },
   "include": ["cypress/**/*.ts"]
 }
