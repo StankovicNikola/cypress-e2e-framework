@@ -1,0 +1,23 @@
+{
+  "name": "cypress-e2e-framework",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "description": "Production-grade Cypress TypeScript e2e framework with POM and CI integration",
+  "scripts": {
+    "cy:open": "cypress open",
+    "cy:run": "cypress run",
+    "cy:run:chrome": "cypress run --browser chrome",
+    "cy:run:firefox": "cypress run --browser firefox",
+    "cy:smoke": "cypress run --spec 'cypress/e2e/smoke/**'",
+    "test": "npm run cy:run"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "cypress": "^15.16.0",
+    "typescript": "^6.0.3"
+  }
+}
