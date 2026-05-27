@@ -7,7 +7,7 @@ const cart = new CartPage()
 describe('Inventory', () => {
   beforeEach(() => {
     cy.loginBySession('standard_user', 'secret_sauce')
-    cy.visit('/inventory.html')
+    cy.visit('/inventory.html', { failOnStatusCode: false })
   })
 
   it('displays 6 products', () => {

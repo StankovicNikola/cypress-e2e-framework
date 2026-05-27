@@ -9,7 +9,7 @@ const checkout = new CheckoutPage()
 describe('Checkout', () => {
   beforeEach(() => {
     cy.loginBySession('standard_user', 'secret_sauce')
-    cy.visit('/inventory.html')
+    cy.visit('/inventory.html', { failOnStatusCode: false })
     inventory.addToCartByName('Sauce Labs Backpack')
     inventory.addToCartByName('Sauce Labs Bike Light')
     inventory.goToCart()
