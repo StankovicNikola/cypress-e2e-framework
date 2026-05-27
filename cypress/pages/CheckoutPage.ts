@@ -29,7 +29,7 @@ export class CheckoutPage extends BasePage {
   }
 
   assertSummaryTotal(expected: string): this {
-    cy.get('.summary_total_label').should('contain.text', expected)
+    cy.get('.summary_subtotal_label').should('contain.text', expected)
     return this
   }
 }

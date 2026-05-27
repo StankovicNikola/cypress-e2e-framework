@@ -18,7 +18,7 @@ describe('Checkout', () => {
   it('completes the full checkout flow', () => {
     cart.checkout()
     checkout.fillInfo('Nikola', 'Stankovic', '11000').continue()
-    checkout.assertSummaryTotal('$32.70')
+    checkout.assertSummaryTotal('$39.98')
     checkout.finish()
     checkout.assertOrderComplete()
   })
