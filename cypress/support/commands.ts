@@ -1,3 +1,5 @@
+import { LoginPage } from '../pages/LoginPage'
+
 declare global {
   namespace Cypress {
     interface Chainable {
@@ -10,10 +12,9 @@ declare global {
 // Uses cy.session to cache login state and skip re-login between tests
 Cypress.Commands.add('loginBySession', (username: string, password: string) => {
   cy.session(username, () => {
-    cy.visit('/')
-    cy.get('[data-test="username"]').type(username)
-    cy.get('[data-test="password"]').type(password, { log: false })
-    cy.get('[data-test="login-button"]').click()
+    const login = new LoginPage()
+    login.visit()
+    login.login(username, password)
     cy.url().should('include', '/inventory.html')
   })
 })

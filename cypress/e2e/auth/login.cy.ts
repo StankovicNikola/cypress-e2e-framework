@@ -28,8 +28,10 @@ describe('Login', () => {
 
   context('Invalid credentials', () => {
     it('shows error for wrong password', () => {
-      login.login('standard_user', 'wrong_password')
-      login.assertErrorVisible('Username and password do not match')
+      cy.fixture('users').then(({ standardUser }) => {
+        login.login(standardUser.username, 'wrong_password')
+        login.assertErrorVisible('Username and password do not match')
+      })
     })
 
     it('shows error for locked_out_user', () => {
@@ -40,13 +42,17 @@ describe('Login', () => {
     })
 
     it('shows error when username is missing', () => {
-      login.fillPassword('secret_sauce').submit()
-      login.assertErrorVisible('Username is required')
+      cy.fixture('users').then(({ standardUser }) => {
+        login.fillPassword(standardUser.password).submit()
+        login.assertErrorVisible('Username is required')
+      })
     })
 
     it('shows error when password is missing', () => {
-      login.fillUsername('standard_user').submit()
-      login.assertErrorVisible('Password is required')
+      cy.fixture('users').then(({ standardUser }) => {
+        login.fillUsername(standardUser.username).submit()
+        login.assertErrorVisible('Password is required')
+      })
     })
   })
 

@@ -5,9 +5,25 @@ export class InventoryPage extends BasePage {
     super('/inventory.html')
   }
 
+  goto(): this {
+    cy.visit(this.baseUrl, { failOnStatusCode: false })
+    return this
+  }
+
   assertLoaded(): this {
     cy.url().should('include', '/inventory.html')
     cy.get('.inventory_list').should('be.visible')
+    return this
+  }
+
+  assertItemStructure($item: JQuery<HTMLElement>): void {
+    cy.wrap($item).find('.inventory_item_name').should('not.be.empty')
+    cy.wrap($item).find('.inventory_item_price').should('not.be.empty')
+    cy.wrap($item).find('button').should('contain.text', 'Add to cart')
+  }
+
+  assertCartBadgeNotVisible(): this {
+    cy.get('.shopping_cart_badge').should('not.exist')
     return this
   }
 

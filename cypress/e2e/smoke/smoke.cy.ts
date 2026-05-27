@@ -1,12 +1,20 @@
+import { LoginPage } from '../../pages/LoginPage'
+import { InventoryPage } from '../../pages/InventoryPage'
+
+const login = new LoginPage()
+const inventory = new InventoryPage()
+
 describe('Smoke', () => {
   it('login page loads', () => {
-    cy.visit('/')
-    cy.get('[data-test="login-button"]').should('be.visible')
+    login.visit()
+    login.assertLoginButtonVisible()
   })
 
   it('inventory is accessible after login', () => {
-    cy.loginBySession('standard_user', 'secret_sauce')
-    cy.visit('/inventory.html', { failOnStatusCode: false })
-    cy.get('.inventory_list').should('be.visible')
+    cy.fixture('users').then(({ standardUser }) => {
+      cy.loginBySession(standardUser.username, standardUser.password)
+      inventory.goto()
+      inventory.assertLoaded()
+    })
   })
 })

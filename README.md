@@ -18,9 +18,12 @@ cypress/
 ├── e2e/
 │   ├── auth/           # Login / session tests
 │   ├── inventory/      # Product listing, sorting, cart
-│   └── checkout/       # End-to-end checkout flow
+│   ├── checkout/       # End-to-end checkout flow
+│   └── smoke/          # Smoke suite
 ├── fixtures/
-│   └── users.json      # Test user credentials
+│   ├── users.json      # Test user credentials
+│   ├── products.json   # Product names and expected sort/price values
+│   └── checkout.json   # Checkout form data and expected order total
 ├── pages/              # Page Object Model classes
 │   ├── BasePage.ts
 │   ├── LoginPage.ts
@@ -93,7 +96,7 @@ npm run cy:smoke
 
 | Test | Description |
 |------|-------------|
-| Full checkout flow | Add 2 items → cart → info form → verify `$32.70` total → complete |
+| Full checkout flow | Add 2 items → cart → info form → verify `$39.98` total → complete |
 | Missing first name | Error: "First Name is required" |
 | Missing last name | Error: "Last Name is required" |
 | Missing postal code | Error: "Postal Code is required" |
@@ -104,17 +107,29 @@ npm run cy:smoke
 All pages extend `BasePage`, which provides shared utilities (`visit`, `getByTestId`, `waitForPageLoad`, `assertUrl`). Page classes expose fluent, chainable methods:
 
 ```ts
-login.visit()
-     .fillUsername('standard_user')
-     .fillPassword('secret_sauce')
-     .submit()
+cy.fixture('users').then(({ standardUser }) => {
+  login.visit()
+       .fillUsername(standardUser.username)
+       .fillPassword(standardUser.password)
+       .submit()
+})
 ```
+
+No selector strings or credential literals appear in test files — all locators live in page classes and all test data is loaded from fixtures.
+
+## Fixtures
+
+| File | Contents |
+|------|----------|
+| `fixtures/users.json` | `standardUser`, `glitchUser`, `lockedUser` credential objects |
+| `fixtures/products.json` | Product names (`backpack`, `bikeLight`), sort expectations (`firstAZ`, `firstZA`), and boundary prices (`lowestPrice`, `highestPrice`) |
+| `fixtures/checkout.json` | `validInfo` object with `firstName`, `lastName`, `postalCode`, and `expectedTotal` |
 
 ## Custom commands
 
 | Command | Description |
 |---------|-------------|
-| `cy.loginBySession(username, password)` | Logs in via UI and caches the session with `cy.session()` — subsequent calls in the same run skip the login page |
+| `cy.loginBySession(username, password)` | Logs in via `LoginPage` POM and caches the session with `cy.session()` — subsequent calls in the same run skip the login page |
 | `cy.clearCookiesAndStorage()` | Clears cookies, localStorage, and sessionStorage |
 
 ## CI/CD

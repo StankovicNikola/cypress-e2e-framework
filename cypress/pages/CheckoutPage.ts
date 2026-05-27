@@ -32,4 +32,9 @@ export class CheckoutPage extends BasePage {
     cy.get('.summary_subtotal_label').should('contain.text', expected)
     return this
   }
+
+  assertErrorVisible(message: string): this {
+    cy.get('[data-test="error"]').should('contain.text', message)
+    return this
+  }
 }

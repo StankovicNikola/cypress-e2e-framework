@@ -29,4 +29,9 @@ export class LoginPage extends BasePage {
     if (message) cy.get('[data-test="error"]').should('contain.text', message)
     return this
   }
+
+  assertLoginButtonVisible(): this {
+    cy.get('[data-test="login-button"]').should('be.visible')
+    return this
+  }
 }

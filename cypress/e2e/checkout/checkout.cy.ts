@@ -8,37 +8,49 @@ const checkout = new CheckoutPage()
 
 describe('Checkout', () => {
   beforeEach(() => {
-    cy.loginBySession('standard_user', 'secret_sauce')
-    cy.visit('/inventory.html', { failOnStatusCode: false })
-    inventory.addToCartByName('Sauce Labs Backpack')
-    inventory.addToCartByName('Sauce Labs Bike Light')
-    inventory.goToCart()
+    cy.fixture('users').then(({ standardUser }) => {
+      cy.loginBySession(standardUser.username, standardUser.password)
+      inventory.goto()
+    })
+    cy.fixture('products').then((products) => {
+      inventory.addToCartByName(products.backpack)
+      inventory.addToCartByName(products.bikeLight)
+      inventory.goToCart()
+    })
   })
 
   it('completes the full checkout flow', () => {
-    cart.checkout()
-    checkout.fillInfo('Nikola', 'Stankovic', '11000').continue()
-    checkout.assertSummaryTotal('$39.98')
-    checkout.finish()
-    checkout.assertOrderComplete()
+    cy.fixture('checkout').then(({ validInfo }) => {
+      cart.checkout()
+      checkout.fillInfo(validInfo.firstName, validInfo.lastName, validInfo.postalCode).continue()
+      checkout.assertSummaryTotal(validInfo.expectedTotal)
+      checkout.finish()
+      checkout.assertOrderComplete()
+    })
   })
 
   it('shows error when first name is missing', () => {
-    cart.checkout()
-    checkout.fillInfo('', 'Stankovic', '11000').continue()
-    cy.get('[data-test="error"]').should('contain.text', 'First Name is required')
+    cy.fixture('checkout').then(({ validInfo }) => {
+      cart.checkout()
+      checkout.fillInfo('', validInfo.lastName, validInfo.postalCode).continue()
+      checkout.assertErrorVisible('First Name is required')
+    })
   })
 
   it('shows error when last name is missing', () => {
-    cart.checkout()
-    checkout.fillInfo('Nikola', '', '11000').continue()
-    cy.get('[data-test="error"]').should('contain.text', 'Last Name is required')
+    cy.fixture('checkout').then(({ validInfo }) => {
+      cart.checkout()
+      checkout.fillInfo(validInfo.firstName, '', validInfo.postalCode).continue()
+      checkout.assertErrorVisible('Last Name is required')
+    })
   })
 
   it('shows error when postal code is missing', () => {
-    cart.checkout()
-    checkout.fillInfo('Nikola', 'Stankovic', '').continue()
-    cy.get('[data-test="error"]').should('contain.text', 'Postal Code is required')
+    cy.fixture('checkout').then(({ validInfo }) => {
+      cart.checkout()
+      checkout.fillInfo(validInfo.firstName, validInfo.lastName, '').continue()
+      checkout.assertErrorVisible('Postal Code is required')
+    })
   })
 
   it('cancel returns to inventory', () => {
