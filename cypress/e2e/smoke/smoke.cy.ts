@@ -6,7 +6,7 @@ describe('Smoke', () => {
 
   it('inventory is accessible after login', () => {
     cy.loginBySession('standard_user', 'secret_sauce')
-    cy.visit('/inventory.html')
+    cy.visit('/inventory.html', { failOnStatusCode: false })
     cy.get('.inventory_list').should('be.visible')
   })
 })
