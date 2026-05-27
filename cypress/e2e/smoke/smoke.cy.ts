@@ -1,15 +1,12 @@
-describe('Smoke suite', () => {
-  it('homepage loads', () => {
+describe('Smoke', () => {
+  it('login page loads', () => {
     cy.visit('/')
-    cy.title().should('not.be.empty')
+    cy.get('[data-test="login-button"]').should('be.visible')
   })
 
-  it('login page is reachable', () => {
-    cy.visit('/login')
-    cy.get('[data-testid="login-submit"]').should('exist')
-  })
-
-  it('health check endpoint returns 200', () => {
-    cy.request(`${Cypress.env('API_URL')}/health`).its('status').should('eq', 200)
+  it('inventory is accessible after login', () => {
+    cy.loginBySession('standard_user', 'secret_sauce')
+    cy.visit('/inventory.html')
+    cy.get('.inventory_list').should('be.visible')
   })
 })

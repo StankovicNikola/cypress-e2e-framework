@@ -1,40 +1,32 @@
 import { BasePage } from './BasePage'
 
 export class LoginPage extends BasePage {
-  private readonly selectors = {
-    emailInput: '[data-testid="email-input"]',
-    passwordInput: '[data-testid="password-input"]',
-    submitButton: '[data-testid="login-submit"]',
-    errorMessage: '[data-testid="login-error"]',
-    forgotPasswordLink: '[data-testid="forgot-password"]',
-  }
-
   constructor() {
-    super('/login')
+    super('/')
   }
 
-  fillEmail(email: string): this {
-    cy.get(this.selectors.emailInput).clear().type(email)
+  fillUsername(username: string): this {
+    cy.get('[data-test="username"]').clear().type(username)
     return this
   }
 
   fillPassword(password: string): this {
-    cy.get(this.selectors.passwordInput).clear().type(password, { log: false })
+    cy.get('[data-test="password"]').clear().type(password, { log: false })
     return this
   }
 
   submit(): this {
-    cy.get(this.selectors.submitButton).click()
+    cy.get('[data-test="login-button"]').click()
     return this
   }
 
-  login(email: string, password: string): this {
-    return this.fillEmail(email).fillPassword(password).submit()
+  login(username: string, password: string): this {
+    return this.fillUsername(username).fillPassword(password).submit()
   }
 
   assertErrorVisible(message?: string): this {
-    cy.get(this.selectors.errorMessage).should('be.visible')
-    if (message) cy.get(this.selectors.errorMessage).should('contain.text', message)
+    cy.get('[data-test="error"]').should('be.visible')
+    if (message) cy.get('[data-test="error"]').should('contain.text', message)
     return this
   }
 }

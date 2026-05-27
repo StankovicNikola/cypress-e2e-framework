@@ -1,65 +1,70 @@
 import { LoginPage } from '../../pages/LoginPage'
-import { DashboardPage } from '../../pages/DashboardPage'
+import { InventoryPage } from '../../pages/InventoryPage'
 
 const login = new LoginPage()
-const dashboard = new DashboardPage()
+const inventory = new InventoryPage()
 
-describe('Authentication', () => {
+describe('Login', () => {
   beforeEach(() => {
+    cy.clearCookiesAndStorage()
     login.visit()
   })
 
   context('Valid credentials', () => {
-    it('logs in and redirects to dashboard', () => {
-      cy.fixture('users').then(({ validUser }) => {
-        login.login(validUser.email, validUser.password)
-        dashboard.assertWelcomeVisible()
-        login.assertUrl('/dashboard')
+    it('standard_user logs in and lands on inventory', () => {
+      cy.fixture('users').then(({ standardUser }) => {
+        login.login(standardUser.username, standardUser.password)
+        inventory.assertLoaded()
       })
     })
 
-    it('persists session across page reload', () => {
-      cy.fixture('users').then(({ validUser }) => {
-        cy.loginByApi(validUser.email, validUser.password)
-        cy.visit('/dashboard')
-        dashboard.assertWelcomeVisible()
+    it('performance_glitch_user eventually logs in', () => {
+      cy.fixture('users').then(({ glitchUser }) => {
+        login.login(glitchUser.username, glitchUser.password)
+        inventory.assertLoaded()
       })
     })
   })
 
   context('Invalid credentials', () => {
-    it('shows an error for wrong password', () => {
-      cy.fixture('users').then(({ validUser }) => {
-        login.login(validUser.email, 'wrongpassword')
-        login.assertErrorVisible('Invalid email or password')
-      })
+    it('shows error for wrong password', () => {
+      login.login('standard_user', 'wrong_password')
+      login.assertErrorVisible('Username and password do not match')
     })
 
-    it('shows an error for unregistered email', () => {
-      login.login('notregistered@example.com', 'Test@1234')
-      login.assertErrorVisible('Invalid email or password')
-    })
-
-    it('shows an error for a locked account', () => {
+    it('shows error for locked_out_user', () => {
       cy.fixture('users').then(({ lockedUser }) => {
-        login.login(lockedUser.email, lockedUser.password)
-        login.assertErrorVisible('account has been locked')
+        login.login(lockedUser.username, lockedUser.password)
+        login.assertErrorVisible('Sorry, this user has been locked out')
       })
+    })
+
+    it('shows error when username is missing', () => {
+      login.fillPassword('secret_sauce').submit()
+      login.assertErrorVisible('Username is required')
+    })
+
+    it('shows error when password is missing', () => {
+      login.fillUsername('standard_user').submit()
+      login.assertErrorVisible('Password is required')
     })
   })
 
-  context('Validation', () => {
-    it('requires email', () => {
-      login.fillPassword('Test@1234').submit()
-      login.getByTestId('email-input').then(($el) => {
-        expect(($el[0] as HTMLInputElement).validity.valueMissing).to.be.true
+  context('Session', () => {
+    it('preserves session on page reload', () => {
+      cy.fixture('users').then(({ standardUser }) => {
+        login.login(standardUser.username, standardUser.password)
+        inventory.assertLoaded()
+        cy.reload()
+        inventory.assertLoaded()
       })
     })
 
-    it('rejects malformed email', () => {
-      login.fillEmail('notanemail').fillPassword('Test@1234').submit()
-      login.getByTestId('email-input').then(($el) => {
-        expect(($el[0] as HTMLInputElement).validity.typeMismatch).to.be.true
+    it('logs out and redirects to login page', () => {
+      cy.fixture('users').then(({ standardUser }) => {
+        login.login(standardUser.username, standardUser.password)
+        inventory.logout()
+        cy.url().should('eq', Cypress.config().baseUrl + '/')
       })
     })
   })

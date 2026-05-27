@@ -1,30 +1,30 @@
 declare global {
   namespace Cypress {
     interface Chainable {
-      loginByApi(email: string, password: string): Chainable<void>
-      loginByUi(email: string, password: string): Chainable<void>
+      loginBySession(username: string, password: string): Chainable<void>
       clearCookiesAndStorage(): Chainable<void>
     }
   }
 }
 
-Cypress.Commands.add('loginByApi', (email: string, password: string) => {
-  cy.request({
-    method: 'POST',
-    url: `${Cypress.env('API_URL')}/auth/login`,
-    body: { email, password },
-  }).then(({ body }) => {
-    window.localStorage.setItem('auth_token', body.token)
-    cy.setCookie('session', body.sessionId)
-  })
-})
-
-Cypress.Commands.add('loginByUi', (email: string, password: string) => {
-  cy.visit('/login')
-  cy.get('[data-testid="email-input"]').type(email)
-  cy.get('[data-testid="password-input"]').type(password, { log: false })
-  cy.get('[data-testid="login-submit"]').click()
-  cy.url().should('include', '/dashboard')
+// Uses cy.session to cache login state and skip re-login between tests
+Cypress.Commands.add('loginBySession', (username: string, password: string) => {
+  cy.session(
+    username,
+    () => {
+      cy.visit('/')
+      cy.get('[data-test="username"]').type(username)
+      cy.get('[data-test="password"]').type(password, { log: false })
+      cy.get('[data-test="login-button"]').click()
+      cy.url().should('include', '/inventory.html')
+    },
+    {
+      validate() {
+        cy.visit('/inventory.html')
+        cy.url().should('include', '/inventory.html')
+      },
+    },
+  )
 })
 
 Cypress.Commands.add('clearCookiesAndStorage', () => {
