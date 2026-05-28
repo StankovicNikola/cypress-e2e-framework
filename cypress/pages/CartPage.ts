@@ -1,6 +1,13 @@
 import { BasePage } from './BasePage'
 
 export class CartPage extends BasePage {
+  private readonly selectors = {
+    cartItem: '.cart_item',
+    inventoryItemName: '.inventory_item_name',
+    continueShopping: '[data-test="continue-shopping"]',
+    checkout: '[data-test="checkout"]',
+  }
+
   constructor() {
     super('/cart.html')
   }
@@ -11,26 +18,26 @@ export class CartPage extends BasePage {
   }
 
   getCartItems() {
-    return cy.get('.cart_item')
+    return cy.get(this.selectors.cartItem)
   }
 
   assertItemPresent(name: string): this {
-    cy.get('.inventory_item_name').should('contain.text', name)
+    cy.get(this.selectors.inventoryItemName).should('contain.text', name)
     return this
   }
 
   assertEmpty(): this {
-    cy.get('.cart_item').should('not.exist')
+    cy.get(this.selectors.cartItem).should('not.exist')
     return this
   }
 
   continueShopping(): this {
-    cy.get('[data-test="continue-shopping"]').click()
+    cy.get(this.selectors.continueShopping).click()
     return this
   }
 
   checkout(): this {
-    cy.get('[data-test="checkout"]').click()
+    cy.get(this.selectors.checkout).click()
     return this
   }
 }

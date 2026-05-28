@@ -1,22 +1,29 @@
 import { BasePage } from './BasePage'
 
 export class LoginPage extends BasePage {
+  private readonly selectors = {
+    username: '[data-test="username"]',
+    password: '[data-test="password"]',
+    loginButton: '[data-test="login-button"]',
+    error: '[data-test="error"]',
+  }
+
   constructor() {
     super('/')
   }
 
   fillUsername(username: string): this {
-    cy.get('[data-test="username"]').clear().type(username)
+    cy.get(this.selectors.username).clear().type(username)
     return this
   }
 
   fillPassword(password: string): this {
-    cy.get('[data-test="password"]').clear().type(password, { log: false })
+    cy.get(this.selectors.password).clear().type(password, { log: false })
     return this
   }
 
   submit(): this {
-    cy.get('[data-test="login-button"]').click()
+    cy.get(this.selectors.loginButton).click()
     return this
   }
 
@@ -25,13 +32,13 @@ export class LoginPage extends BasePage {
   }
 
   assertErrorVisible(message?: string): this {
-    cy.get('[data-test="error"]').should('be.visible')
-    if (message) cy.get('[data-test="error"]').should('contain.text', message)
+    cy.get(this.selectors.error).should('be.visible')
+    if (message) cy.get(this.selectors.error).should('contain.text', message)
     return this
   }
 
   assertLoginButtonVisible(): this {
-    cy.get('[data-test="login-button"]').should('be.visible')
+    cy.get(this.selectors.loginButton).should('be.visible')
     return this
   }
 }
