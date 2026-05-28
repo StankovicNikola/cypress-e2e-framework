@@ -104,7 +104,21 @@ npm run cy:smoke
 
 ## Page Object Model
 
-All pages extend `BasePage`, which provides shared utilities (`visit`, `getByTestId`, `waitForPageLoad`, `assertUrl`). Page classes expose fluent, chainable methods:
+All pages extend `BasePage`, which provides shared utilities (`visit`, `getByTestId`, `waitForPageLoad`, `assertUrl`). Each page class declares a `private readonly selectors` object that centralises every selector string in one place — no selector literals appear anywhere outside the page class that owns them:
+
+```ts
+export class LoginPage extends BasePage {
+  private readonly selectors = {
+    username: '[data-test="username"]',
+    password: '[data-test="password"]',
+    loginButton: '[data-test="login-button"]',
+    error: '[data-test="error"]',
+  }
+  // ...
+}
+```
+
+Methods reference `this.selectors.*` rather than inlining strings, so a selector change requires editing exactly one line. Page classes expose fluent, chainable methods:
 
 ```ts
 cy.fixture('users').then(({ standardUser }) => {
